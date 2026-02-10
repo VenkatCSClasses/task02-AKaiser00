@@ -1,2 +1,267 @@
+# Tests for the bankAccount class
+# If no method is specified, use the method stated above the test
+# Created by making a few methods by hand to allow the AI to understand 
+# Then I fed bankAccount tests into a prompt, allowing it to convert into the yaml formatting I used
 
+constructor:
+  - name: "default email case"
+    account: {email: "a@b.com", startingBalance: 200}
+    method: getEmail
+    output: "a@b.com"
+
+  - name: "default balance case"
+    account: {email: "a@b.com", startingBalance: 200}
+    method: getBalance
+    output: 200
+
+  - name: "missing email case"
+    account: {email: "", startingBalance: 200}
+    method: constructor
+    output: {error: "IllegalArgumentException"}
+
+  - name: "almost zero"
+    account: {email: "a@b.com", startingBalance: 0.01}
+    method: getBalance
+    output: 0.01
+
+  - name: "barely negative"
+    account: {email: "a@b.com", startingBalance: -0.01}
+    method: constructor
+    output: {error: "IllegalArgumentException"}
+
+  - name: "normal negative"
+    account: {email: "a@b.com", startingBalance: -200}
+    method: constructor
+    output: {error: "IllegalArgumentException"}
+
+  - name: "3 decimal places"
+    account: {email: "a@b.com", startingBalance: 200.001}
+    method: constructor
+    output: {error: "IllegalArgumentException"}
+
+  - name: ">3 decimal places"
+    account: {email: "a@b.com", startingBalance: 200.0001}
+    method: constructor
+    output: {error: "IllegalArgumentException"}
+
+getBalance:
+  - name: "normal positive"
+    account: {email: "a@b.com", startingBalance: 200}
+    output: 200
+
+  - name: "smallest positive"
+    account: {email: "a@b.com", startingBalance: 0.01}
+    output: 0.01
+  
+getEmail:
+  - name: "regular email"
+    account: {email: "a@b.com", startingBalance: 200}
+    output: "a@b.com"
+
+withdraw:
+  - name: "doesn't fully remove balance"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 100}
+    output: 100
+
+  - name: "fully removes balance"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 200}
+    output: 0
+
+  - name: "$0.01 overdraft"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 200.01}
+    output: {error: "InsufficientFundsException"}
+
+  - name: "overdraft"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 300}
+    output: {error: "InsufficientFundsException"}
+
+  - name: "0"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 0}
+    output: {error: "IllegalArgumentException"}
+
+  - name: "negative withdrawal"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: -150}
+    output: {error: "IllegalArgumentException"}
+
+  - name: "3 decimal places"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 100.001}
+    output: {error: "IllegalArgumentException"}
+
+  - name: ">3 decimal places"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 100.0001}
+    output: {error: "IllegalArgumentException"}
+
+deposit:
+  - name: "normal deposit"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 100}
+    output: 300
+
+  - name: "smallest deposit"
+    account: {email: "a@b.com", startingBalance: 300}
+    parameters: {amount: 0.01}
+    output: 300.01
+
+  - name: "zero"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 0}
+    output: {error: "IllegalArgumentException"}
+
+  - name: "negative"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: -0.01}
+    output: {error: "IllegalArgumentException"}
+  
+  - name: "3 decimal places"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 100.001}
+    output: {error: "IllegalArgumentException"}
+
+  - name: ">3 decimal places"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 100.0001}
+    output: {error: "IllegalArgumentException"}
+
+transfer:
+  - name: "normal transfer"
+    account: {email: "a@b.com", startingBalance: 200}
+    parameters: {amount: 100, target: {email: "c@d.com", startingBalance: 200}}
+    output: 100
+
+  - name: "transfer all"
+    account: {email: "a@b.com", startingBalance: 100}
+    parameters: {amount: 100, target: {email: "c@d.com", startingBalance: 300}}
+    output: 0
+
+  - name: "overdraft by 1 (empty)"
+    account: {email: "a@b.com", startingBalance: 0}
+    parameters: {amount: 1, target: {email: "c@d.com", startingBalance: 400}}
+    output: {error: "InsufficientFundsException"}
+
+  - name: "overdraft"
+    account: {email: "e@f.com", startingBalance: 200}
+    parameters: {amount: 300, target: {email: "c@d.com", startingBalance: 200}}
+    output: {error: "InsufficientFundsException"}
+
+  - name: "negative"
+    account: {email: "e@f.com", startingBalance: 200}
+    parameters: {amount: -100, target: {email: "c@d.com", startingBalance: 200}}
+    output: {error: "IllegalArgumentException"}
+
+  - name: "zero"
+    account: {email: "e@f.com", startingBalance: 200}
+    parameters: {amount: 0, target: {email: "c@d.com", startingBalance: 200}}
+    output: {error: "IllegalArgumentException"}
+  
+  - name: "3 decimal places"
+    account: {email: "e@f.com", startingBalance: 200}
+    parameters: {amount: 100.001, target: {email: "c@d.com", startingBalance: 200}}
+    output: {error: "IllegalArgumentException"}
+
+  - name: "null receiver"
+    account: {email: "e@f.com", startingBalance: 200}
+    parameters: {amount: 100, target: null}
+    output: {error: "IllegalArgumentException"}
+
+isEmailValid:
+  - name: "empty string"
+    parameters: {email: ""}
+    output: false
+
+  - name: "smallest valid email"
+    parameters: {email: "a@b.cc"}
+    output: true
+
+  - name: "normal email"
+    parameters: {email: "abc@def.com"}
+    output: true
+
+  - name: "empty prefix"
+    parameters: {email: "@mail.com"}
+    output: false
+
+  - name: "smallest valid prefix"
+    parameters: {email: "a@def.com"}
+    output: true
+
+  - name: "missing domain"
+    parameters: {email: "abc@"}
+    output: false
+
+  - name: "smallest valid domain"
+    parameters: {email: "abc@d.cc"}
+    output: true
+
+  - name: "tag length 1"
+    parameters: {email: "abc@d.e"}
+    output: false
+
+  - name: "tag length 3+"
+    parameters: {email: "abc@d.com"}
+    output: true
+
+  - name: "1 invalid char"
+    parameters: {email: "abc:abc@def.com"}
+    output: false
+
+  - name: "special @ start of prefix"
+    parameters: {email: "-abc@def.com"}
+    output: false
+
+  - name: "special @ end of prefix"
+    parameters: {email: "abc-@def.com"}
+    output: false
+
+  - name: "specials @ middle of prefix, consecutive"
+    parameters: {email: "abc--abc@def.com"}
+    output: false
+
+  - name: "special @ middle of prefix, non-consecutive"
+    parameters: {email: "abc-abc@def.com"}
+    output: true
+
+  - name: "0 @ symbols"
+    parameters: {email: "abcdef.com"}
+    output: false
+
+  - name: "2 @ symbols"
+    parameters: {email: "abc@def@def.com"}
+    output: false
+
+isAmountValid:
+  - name: "valid case"
+    parameters: {amount: 200}
+    output: true
+
+  - name: "most decimal points allowed"
+    parameters: {amount: 200.11}
+    output: true
+  
+  - name: "closest to non-positive"
+    parameters: {amount: 0.01}
+    output: true
+  
+  - name: "negative case"
+    parameters: {amount: -200.1}
+    output: false
+  
+  - name: "closest to non-negative"
+    parameters: {amount: 0}
+    output: false
+  
+  - name: "3 decimal places"
+    parameters: {amount: 200.333}
+    output: false
+  
+  - name: ">3 decimal places"
+    parameters: {amount: 200.33333}
+    output: false
 
