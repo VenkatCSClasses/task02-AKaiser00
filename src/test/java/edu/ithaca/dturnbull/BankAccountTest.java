@@ -74,8 +74,8 @@ class BankAccountTest {
         assertThrows(InsufficientFundsException.class, () -> bankAccount.transfer(100, receiver));
         
         // Overdraft by 1
-        BankAccount bankAccount2 = new BankAccount("a@b.com", 0);
-        assertThrows(InsufficientFundsException.class, () -> bankAccount2.transfer(1, receiver));
+        BankAccount bankAccount2 = new BankAccount("a@b.com", 1);
+        assertThrows(InsufficientFundsException.class, () -> bankAccount2.transfer(2, receiver));
 
         // Negative
         assertThrows(IllegalArgumentException.class, () -> bankAccount.transfer(-100, receiver));

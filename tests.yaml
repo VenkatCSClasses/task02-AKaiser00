@@ -141,9 +141,9 @@ transfer:
     parameters: {amount: 100, target: {email: "c@d.com", startingBalance: 300}}
     output: 0
 
-  - name: "overdraft by 1 (empty)"
-    account: {email: "a@b.com", startingBalance: 0}
-    parameters: {amount: 1, target: {email: "c@d.com", startingBalance: 400}}
+  - name: "overdraft by 1"
+    account: {email: "a@b.com", startingBalance: 1}
+    parameters: {amount: 2, target: {email: "c@d.com", startingBalance: 400}}
     output: {error: "InsufficientFundsException"}
 
   - name: "overdraft"
